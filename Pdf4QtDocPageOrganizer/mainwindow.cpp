@@ -37,6 +37,10 @@
 #include <QPixmapCache>
 #include <QScreen>
 #include <QGuiApplication>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QStringList>
+#include <QString>
 
 namespace pdfdocpage
 {
@@ -222,6 +226,40 @@ QSize MainWindow::getMaxPageImageSize() const
 void MainWindow::on_actionClose_triggered()
 {
     close();
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent *event)
+{
+    if (event->mimeData()->hasUrls())
+        event->acceptProposedAction();
+}
+
+void MainWindow::dropEvent(QDropEvent *event)
+{
+    const QMimeData* mimeData = event->mimeData();
+    QStringList fileNames;
+    if (mimeData->hasUrls())
+    {
+        QList<QUrl> urlList = mimeData->urls();
+
+        // extract the local paths of the files
+        for (int i = 0; i < urlList.size() && i < 32; ++i)
+        {
+            qDebug() << urlList.at(i).toLocalFile();
+            fileNames.append(urlList.at(i).toLocalFile());
+        }
+
+    }
+    if (!fileNames.isEmpty())
+    {
+        for (const QString& fileName : fileNames)
+        {
+            if (!insertDocument(fileName, QModelIndex()))
+            {
+                break;
+            }
+        }
+    }
 }
 
 void MainWindow::on_actionAddDocuments_triggered()
