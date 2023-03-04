@@ -110,6 +110,8 @@ private:
 
     bool canPerformOperation(Operation operation) const;
     void performOperation(Operation operation);
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dropEvent(QDropEvent *event);
 
     struct Settings
     {
