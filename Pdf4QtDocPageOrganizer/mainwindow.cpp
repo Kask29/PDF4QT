@@ -179,6 +179,10 @@ MainWindow::MainWindow(QWidget* parent) :
     connect(&m_mapper, &QSignalMapper::mappedInt, this, &MainWindow::onMappedActionTriggered);
     connect(ui->documentItemsView->selectionModel(), &QItemSelectionModel::selectionChanged, this, &MainWindow::updateActions);
 
+    ui->documentItemsView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->documentItemsView, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(onCustomContextMenuItem(const QPoint &)));
+    connect(ui->documentItemsView, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(onDocumentItemDblClick(const QModelIndex &)));
+
     QList<QAction*> actions = findChildren<QAction*>();
     for (QAction* action : actions)
     {
@@ -261,7 +265,38 @@ void MainWindow::dropEvent(QDropEvent *event)
         }
     }
 }
-
+ 
+ void MainWindow::onCustomContextMenuItem(const QPoint &point)
+{
+    QModelIndex index = ui->documentItemsView->indexAt(point);
+    if (index.isValid())
+    {
+        QMenu *contextMenuItem = new QMenu();
+        contextMenuItem->addAction(ui->actionRemoveSelection);
+        contextMenuItem->addAction(ui->actionCloneSelection);
+        contextMenuItem->addAction(ui->actionInvert_Selection);
+        contextMenuItem->addAction(ui->actionReplaceSelection);
+        contextMenuItem->addAction(ui->actionCopy);
+        contextMenuItem->addAction(ui->actionCut);
+        contextMenuItem->addAction(ui->actionRotate_Left);
+        contextMenuItem->addAction(ui->actionRotate_Right);
+        contextMenuItem->addAction(ui->actionRotate_Right);
+        contextMenuItem->addAction(ui->actionGroup);
+        contextMenuItem->addAction(ui->actionUngroup);
+        contextMenuItem->exec(ui->documentItemsView->viewport()->mapToGlobal(point));
+    }
+    else
+    {
+        QMenu *contextMenuViewer = new QMenu();
+        contextMenuViewer->addAction(ui->actionSelect_All);
+        contextMenuViewer->addAction(ui->actionPaste);
+        contextMenuViewer->addAction(ui->actionInsert_Empty_Page);
+        contextMenuViewer->addAction(ui->actionInsert_Image);
+        contextMenuViewer->addAction(ui->actionInsert_PDF);
+        contextMenuViewer->exec(ui->documentItemsView->viewport()->mapToGlobal(point));
+    }
+}
+ 
 void MainWindow::on_actionAddDocuments_triggered()
 {
     QStringList fileNames = QFileDialog::getOpenFileNames(this, tr("Select PDF document(s)"), m_settings.directory, tr("PDF document (*.pdf)"));
