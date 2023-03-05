@@ -25,6 +25,7 @@
 
 #include <QMainWindow>
 #include <QSignalMapper>
+#include <QPoint>
 
 namespace Ui
 {
@@ -102,6 +103,7 @@ private slots:
     void on_actionAddDocuments_triggered();
     void onMappedActionTriggered(int actionId);
     void updateActions();
+    void onCustomContextMenuItem(const QPoint &point);
 
 private:
     void loadSettings();
