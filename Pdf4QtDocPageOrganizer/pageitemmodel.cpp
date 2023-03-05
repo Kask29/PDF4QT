@@ -19,6 +19,7 @@
 
 #include <QFileInfo>
 #include <QImageReader>
+#include <QString>
 
 #include <iterator>
 
@@ -88,6 +89,9 @@ QVariant PageItemModel::data(const QModelIndex& index, int role) const
         case Qt::DisplayRole:
             return m_pageGroupItems.at(index.row()).groupName;
 
+        case Qt::ToolTipRole:
+            return  getItem(index)->groupName;
+            
         default:
             break;
     }
